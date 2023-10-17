@@ -262,13 +262,15 @@ def main():
             {'$match': {'transportation_mode': {'$ne': ''}}},
             {"$group": {'_id': '$user_id', 'top_mode': {
                 '$first': '$transportation_mode'}, 'count': {'$sum': 1}}},
-            {"$sort": {"count": -1}},
+            {"$sort": {"_id": 1}},
         ]))
 
         print('Users and their most used transportation mode:')
         for u in usersTransportation:
             print(
                 f'''(ID: {u['_id']}, Mode: {u['top_mode']}, Count: {u['count']})''')
+
+        print('Task 9')
 
     except Exception as e:
         print('ERROR: Failed to use database:', e)
