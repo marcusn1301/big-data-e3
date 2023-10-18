@@ -169,6 +169,10 @@ def main():
         # print('Acitivities:', activityCount)
         # print('Trackpoints:', trackpointCount)
 
+        # Users: 173
+        # Acitivities: 16048
+        # Trackpoints: 9681756
+
         # print('Task 2')
         # print('Average number of activities pr user:', activityCount/userCount)
         # # Average number of activities pr user: 92.76300578034682
@@ -184,8 +188,8 @@ def main():
         # print([*activityCollection.aggregate([
         #     {'$match': {'transportation_mode': 'taxi'}},
         #     {"$group" : {'_id': "$user_id"}},
-        # ])][:20])
-        # # [{'_id': 58}, {'_id': 80}, {'_id': 78}, {'_id': 10}, {'_id': 98}, {'_id': 128}, {'_id': 163}, {'_id': 62}, {'_id': 85}, {'_id': 111}]
+        # ])])
+        # # [{'_id': 10}, {'_id': 85}, {'_id': 62}, {'_id': 58}, {'_id': 128}, {'_id': 78}, {'_id': 163}, {'_id': 80}, {'_id': 111}, {'_id': 98}]
 
         # print('Task 5')
         # print([*activityCollection.aggregate([
@@ -206,10 +210,10 @@ def main():
         # print([*activityCollection.aggregate([
         #     {'$addFields': {'hours': {'$dateDiff': {'startDate': '$start_date_time', 'endDate': '$end_date_time', 'unit': 'hour'}}}},
         #     {"$group" : {'_id': {'$year': '$start_date_time'}, 'hours': {'$sum': '$hours'}}},
-        #     {"$sort": {"count": -1}}
+        #     {"$sort": {"hours": -1}}
         # ])])
-        # # [{'_id': 2009, 'hours': 11636}, {'_id': 2010, 'hours': 1432}, {'_id': 2008, 'hours': 9105}, {'_id': 2011, 'hours': 1130}, {'_id': 2012, 'hours': 721}, {'_id': 2007, 'hours': 2324}, {'_id': 2000, 'hours': 0}]
-
+        # # [{'_id': 2009, 'hours': 11636}, {'_id': 2008, 'hours': 9105}, {'_id': 2007, 'hours': 2324}, {'_id': 2010, 'hours': 1432}, {'_id': 2011, 'hours': 1130}, {'_id': 2012, 'hours': 721}, {'_id': 2000, 'hours': 0}
+        
         # print('Task 7')
         # walkActivityIDs = [activity['_id'] for activity in activityCollection.aggregate([
         #     {'$addFields': {'year': {'$year': '$start_date_time'}}},
@@ -232,7 +236,38 @@ def main():
         # print('Total distance walked by user 112 in 2008:', totalDist)
         # # Total distance walked by user 112 in 2008: 115.47465961507991
 
+        # print('Task 8')
+        # activitiesToAltitudes = [*trackpointsCollection.aggregate([
+        #     {'$match': {'altitude': {'$ne': -777}}},
+        #     {"$group" : {
+        #         '_id': '$activity_id', 
+        #         'altitudes': {'$push': '$altitude'},
+        #     }},
+        #     {'$project': {'altitudes': True}},
+        #     {'$lookup': {
+        #         'from': 'Activity',
+        #         'localField':'_id',
+        #         'foreignField': '_id',
+        #         'as': 'activity'
+        #     }},
+        #     {'$project': {'altitudes': True, 'user_id': {'$first': '$activity.user_id'}}} # Dette e ganske sjuk syntax
+        # ])]
 
+        # # print('Activities:', len(activitiesToAltitudes))
+        # # # Activities: 16041
+        # # # Det finnes 7 activities uten trackpoints tydeligvis...
+
+        # userToAltitudeGained = dict.fromkeys([a['user_id'] for a in activitiesToAltitudes], 0)
+        # for activityToAltitudes in activitiesToAltitudes:
+        #     lastAltitude = None
+        #     for altitude in activityToAltitudes['altitudes']:
+        #         if lastAltitude != None and altitude > lastAltitude:
+        #             userToAltitudeGained[activityToAltitudes['user_id']] += (altitude - lastAltitude)
+        #         lastAltitude = altitude
+        # userToAltitudeGained = dict(sorted(userToAltitudeGained.items(), key=lambda kv: kv[1], reverse=True))
+        # userToAltitudeGained = {k: userToAltitudeGained[k] for k in list(userToAltitudeGained)[:20]}
+        # print(userToAltitudeGained)
+        # # {128: 2135669.282417741, 153: 1820736.9522737002, 4: 1089358.0, 41: 789924.1000003539, 3: 766613.0, 85: 714053.1000000071, 163: 673472.3440420027, 62: 596106.5999999233, 144: 588718.9123359431, 30: 576377.0, 39: 481311.0, 84: 430319.0, 0: 398638.0, 2: 377503.0, 167: 370650.1136482952, 25: 358131.7999999046, 37: 325572.79999995086, 140: 311175.52283458825, 126: 272394.47427820024, 17: 205319.39999998698}
 
     except Exception as e:
         print('ERROR: Failed to use database:', e)
