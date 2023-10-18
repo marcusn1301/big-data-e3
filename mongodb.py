@@ -1,4 +1,4 @@
-from pprint import pprint 
+from pprint import pprint
 from DbConnector import DbConnector
 
 import os
@@ -8,6 +8,7 @@ import datetime
 
 from haversine import haversine
 
+
 class ExampleProgram:
 
     def __init__(self):
@@ -16,7 +17,7 @@ class ExampleProgram:
         self.db = self.connection.db
 
     def create_coll(self, collection_name):
-        collection = self.db.create_collection(collection_name)    
+        collection = self.db.create_collection(collection_name)
         print('Created collection: ', collection)
 
     def insert_documents(self):
@@ -43,22 +44,20 @@ class ExampleProgram:
         #     'activity_id': ObjectId()
         # }
 
-
-
         labeled_ids = []
 
         with open(f'./dataset/labeled_ids.txt') as labeled_ids_file:
             lines = labeled_ids_file.read().splitlines()
             labeled_ids += list(map(lambda l: int(l), lines))
-        
+
         activityCollection = self.db['Activity']
         trackpointsCollection = self.db['Trackpoint']
 
         for userID in filter(lambda u: u.isnumeric(), os.listdir('./dataset/Data')):
             hasLabel = int(userID) in labeled_ids
-            
+
             print('Inserting user', userID)
-            
+
             # self.cursor.execute(f'INSERT INTO User VALUES ({int(userID)}, {hasLabel})')
 
             labels = []
@@ -73,7 +72,8 @@ class ExampleProgram:
                         words[0] = words[0].replace('/', '-')
                         words[2] = words[2].replace('/', '-')
 
-                        labels.append([datetime.datetime.fromisoformat('T'.join(words[:2])), datetime.datetime.fromisoformat('T'.join(words[2:4])), words[4]])
+                        labels.append([datetime.datetime.fromisoformat('T'.join(
+                            words[:2])), datetime.datetime.fromisoformat('T'.join(words[2:4])), words[4]])
 
             for activityID in map(lambda f: f.split('.')[0], os.listdir(f'./dataset/Data/{userID}/Trajectory')):
                 with open(f'./dataset/Data/{userID}/Trajectory/{activityID}.plt') as pltFile:
@@ -83,8 +83,10 @@ class ExampleProgram:
                     if len(lines) > 2500:
                         continue
 
-                    startDateTime = datetime.datetime.fromisoformat('T'.join(lines[0].split(',')[-2:]))
-                    endDateTime = datetime.datetime.fromisoformat('T'.join(lines[-1].split(',')[-2:]))
+                    startDateTime = datetime.datetime.fromisoformat(
+                        'T'.join(lines[0].split(',')[-2:]))
+                    endDateTime = datetime.datetime.fromisoformat(
+                        'T'.join(lines[-1].split(',')[-2:]))
 
                     transportationMode = ''
 
@@ -103,40 +105,38 @@ class ExampleProgram:
                             '_id': ObjectId(),
                             'lat': float(fields[0]),
                             'lon': float(fields[1]),
-                            'altitude': float(fields[3]), # Ifølge oppgaven e altitude en int, men i datasettet e det en float, f.eks user 135...
+                            # Ifølge oppgaven e altitude en int, men i datasettet e det en float, f.eks user 135...
+                            'altitude': float(fields[3]),
                             'date_days': float(fields[4]),
                             'date_time': datetime.datetime.fromisoformat('T'.join(fields[-2:])),
                             'activity_id': activityObjectID
                         })
-                    
+
                     trackpointsCollection.insert_many(trackpoints)
 
                     activityCollection.insert_one({
                         '_id': activityObjectID,
                         'user_id': int(userID),
                         'user_has_label': hasLabel,
-                        'transportation_mode': transportationMode, 
+                        'transportation_mode': transportationMode,
                         'start_date_time': startDateTime,
                         'end_date_time': endDateTime,
                         'trackpoints': list(map(lambda t: t['_id'], trackpoints))
                     })
-        
+
     def fetch_documents(self, collection_name):
         collection = self.db[collection_name]
         documents = collection.find({})
-        for doc in documents: 
+        for doc in documents:
             pprint(doc)
-        
 
     def drop_coll(self, collection_name):
         collection = self.db[collection_name]
         collection.drop()
 
-        
     def show_coll(self):
         collections = self.client['test'].list_collection_names()
         print(collections)
-         
 
 
 def main():
@@ -158,8 +158,8 @@ def main():
         trackpointsCollection = program.db['Trackpoint']
 
         # Aggregation e det komplekse queries i MongoDB består av: https://pymongo.readthedocs.io/en/stable/examples/aggregation.html
-        # No inserte vi bare users som har trackpoints, mens i exercise 2 inserte vi alle users, 
-        # også dem som ikke har Activities. 
+        # No inserte vi bare users som har trackpoints, mens i exercise 2 inserte vi alle users,
+        # også dem som ikke har Activities.
 
         # print('Task 1')
         # userCount = len(activityCollection.distinct('user_id'))
@@ -173,9 +173,11 @@ def main():
         # Acitivities: 16048
         # Trackpoints: 9681756
 
+
         # print('Task 2')
         # print('Average number of activities pr user:', activityCount/userCount)
         # # Average number of activities pr user: 92.76300578034682
+
 
         # print('Task 3')
         # print([*activityCollection.aggregate([
@@ -183,13 +185,15 @@ def main():
         #     {"$sort": {"count": -1}},
         # ])][:20])
         # # [{'_id': 128, 'count': 2102}, {'_id': 153, 'count': 1793}, {'_id': 25, 'count': 715}, {'_id': 163, 'count': 704}, {'_id': 62, 'count': 691}, {'_id': 144, 'count': 563}, {'_id': 41, 'count': 399}, {'_id': 85, 'count': 364}, {'_id': 4, 'count': 346}, {'_id': 140, 'count': 345}, {'_id': 167, 'count': 320}, {'_id': 68, 'count': 280}, {'_id': 17, 'count': 265}, {'_id': 3, 'count': 261}, {'_id': 14, 'count': 236}, {'_id': 126, 'count': 215}, {'_id': 30, 'count': 210}, {'_id': 112, 'count': 208}, {'_id': 11, 'count': 201}, {'_id': 39, 'count': 198}]
-        
+
+
         # print('Task 4')
         # print([*activityCollection.aggregate([
         #     {'$match': {'transportation_mode': 'taxi'}},
         #     {"$group" : {'_id': "$user_id"}},
         # ])])
         # # [{'_id': 10}, {'_id': 85}, {'_id': 62}, {'_id': 58}, {'_id': 128}, {'_id': 78}, {'_id': 163}, {'_id': 80}, {'_id': 111}, {'_id': 98}]
+
 
         # print('Task 5')
         # print([*activityCollection.aggregate([
@@ -199,12 +203,14 @@ def main():
         # ])])
         # # [{'_id': 'walk', 'count': 481}, {'_id': 'car', 'count': 419}, {'_id': 'bike', 'count': 262}, {'_id': 'bus', 'count': 199}, {'_id': 'subway', 'count': 133}, {'_id': 'taxi', 'count': 37}, {'_id': 'airplane', 'count': 3}, {'_id': 'train', 'count': 2}, {'_id': 'run', 'count': 1}, {'_id': 'boat', 'count': 1}]
 
+
         # print('Task 6a')
         # print([*activityCollection.aggregate([
         #     {"$group" : {'_id': {'$year': '$start_date_time'}, 'count': {'$sum': 1}}},
         #     {"$sort": {"count": -1}}
         # ])])
         # # [{'_id': 2008, 'count': 5895}, {'_id': 2009, 'count': 5879}, {'_id': 2010, 'count': 1487}, {'_id': 2011, 'count': 1204}, {'_id': 2007, 'count': 994}, {'_id': 2012, 'count': 588}, {'_id': 2000, 'count': 1}]
+
 
         # print('Task 6b')
         # print([*activityCollection.aggregate([
@@ -214,6 +220,7 @@ def main():
         # ])])
         # # [{'_id': 2009, 'hours': 11636}, {'_id': 2008, 'hours': 9105}, {'_id': 2007, 'hours': 2324}, {'_id': 2010, 'hours': 1432}, {'_id': 2011, 'hours': 1130}, {'_id': 2012, 'hours': 721}, {'_id': 2000, 'hours': 0}
         
+
         # print('Task 7')
         # walkActivityIDs = [activity['_id'] for activity in activityCollection.aggregate([
         #     {'$addFields': {'year': {'$year': '$start_date_time'}}},
@@ -235,6 +242,7 @@ def main():
 
         # print('Total distance walked by user 112 in 2008:', totalDist)
         # # Total distance walked by user 112 in 2008: 115.47465961507991
+
 
         # print('Task 8')
         # activitiesToAltitudes = [*trackpointsCollection.aggregate([
@@ -267,7 +275,43 @@ def main():
         # userToAltitudeGained = dict(sorted(userToAltitudeGained.items(), key=lambda kv: kv[1], reverse=True))
         # userToAltitudeGained = {k: userToAltitudeGained[k] for k in list(userToAltitudeGained)[:20]}
         # print(userToAltitudeGained)
-        # # {128: 2135669.282417741, 153: 1820736.9522737002, 4: 1089358.0, 41: 789924.1000003539, 3: 766613.0, 85: 714053.1000000071, 163: 673472.3440420027, 62: 596106.5999999233, 144: 588718.9123359431, 30: 576377.0, 39: 481311.0, 84: 430319.0, 0: 398638.0, 2: 377503.0, 167: 370650.1136482952, 25: 358131.7999999046, 37: 325572.79999995086, 140: 311175.52283458825, 126: 272394.47427820024, 17: 205319.39999998698}
+        # # {128: 2135669.282417741, 153: 1820736.9522737002,x 4: 1089358.0, 41: 789924.1000003539, 3: 766613.0, 85: 714053.1000000071, 163: 673472.3440420027, 62: 596106.5999999233, 144: 588718.9123359431, 30: 576377.0, 39: 481311.0, 84: 430319.0, 0: 398638.0, 2: 377503.0, 167: 370650.1136482952, 25: 358131.7999999046, 37: 325572.79999995086, 140: 311175.52283458825, 126: 272394.47427820024, 17: 205319.39999998698}
+
+
+        # print('Task 10')
+        # forbiddenUsers = list(trackpointsCollection.aggregate([
+        #     {'$project': {
+        #         'lat': {'$round': ['$lat', 3]},
+        #         'lon': {'$round': ['$lon', 3]},
+        #         'activity_id': True
+        #     }},
+        #     {'$match': {
+        #         'lat': 39.916,
+        #         'lon': 116.397
+        #     }},
+        #     {'$lookup': {
+        #         'from': 'Activity',
+        #         'localField':'activity_id',
+        #         'foreignField': '_id',
+        #         'as': 'activity'
+        #     }},
+        #     {'$group': {'_id': {'$first': '$activity.user_id'}}}
+        # ]))
+        # print([u['_id'] for u in forbiddenUsers])
+        # # [4, 131, 18]
+        
+
+        # print('Task 11')
+        # usersTransportation = list(activityCollection.aggregate([
+        #     {'$match': {'transportation_mode': {'$ne': ''}}},
+        #     {"$group": {'_id': '$user_id', 'top_mode': {
+        #         '$first': '$transportation_mode'}, 'count': {'$sum': 1}}},
+        #     {"$sort": {"_id": 1}},
+        # ]))
+
+        # print('Users and their most used transportation mode:')
+        # for u in usersTransportation:
+        #     print(f'''(ID: {u['_id']}, Mode: {u['top_mode']}, Count: {u['count']})''')
 
     except Exception as e:
         print('ERROR: Failed to use database:', e)
