@@ -277,6 +277,36 @@ def main():
         # print(userToAltitudeGained)
         # # {128: 2135669.282417741, 153: 1820736.9522737002,x 4: 1089358.0, 41: 789924.1000003539, 3: 766613.0, 85: 714053.1000000071, 163: 673472.3440420027, 62: 596106.5999999233, 144: 588718.9123359431, 30: 576377.0, 39: 481311.0, 84: 430319.0, 0: 398638.0, 2: 377503.0, 167: 370650.1136482952, 25: 358131.7999999046, 37: 325572.79999995086, 140: 311175.52283458825, 126: 272394.47427820024, 17: 205319.39999998698}
 
+        # print('Task 9')
+        # activityToTimestamps = [*trackpointsCollection.aggregate([
+        #     {"$group" : {
+        #         '_id': '$activity_id', 
+        #         'date_times': {'$push': '$date_time'},
+        #     }},
+        #     {'$lookup': {
+        #         'from': 'Activity',
+        #         'localField':'_id',
+        #         'foreignField': '_id',
+        #         'as': 'activity'
+        #     }},
+        #     {'$project': {'user_id': {'$first': '$activity.user_id'}, 'date_times': True}}
+        # ])]
+
+        # usersWithInvalidActivities = {}
+
+        # for activityToTimestamp in activityToTimestamps:
+        #     lastDateTime = None
+        #     for dateTime in activityToTimestamp['date_times']:
+        #         if lastDateTime != None and dateTime - lastDateTime >= datetime.timedelta(minutes=5):
+        #             if activityToTimestamp['user_id'] in usersWithInvalidActivities:
+        #                 usersWithInvalidActivities[activityToTimestamp['user_id']] += 1
+        #             else:
+        #                 usersWithInvalidActivities[activityToTimestamp['user_id']] = 1
+        #             break
+        #         lastDateTime = dateTime
+
+        # print(f'Users with number of invalid activities: {usersWithInvalidActivities}')
+        # # Users with number of invalid activities: {135: 5, 132: 3, 104: 97, 103: 24, 168: 19, 157: 9, 150: 16, 159: 5, 166: 2, 161: 7, 102: 13, 105: 9, 133: 4, 134: 31, 158: 9, 167: 134, 151: 1, 169: 9, 24: 27, 23: 11, 15: 46, 12: 43, 79: 2, 46: 13, 41: 201, 48: 1, 77: 3, 83: 15, 84: 99, 70: 5, 13: 29, 14: 118, 22: 55, 25: 263, 71: 29, 85: 184, 82: 27, 76: 8, 40: 17, 78: 19, 47: 6, 65: 26, 91: 63, 96: 35, 62: 249, 54: 2, 53: 7, 98: 5, 38: 58, 7: 30, 0: 101, 9: 31, 36: 34, 31: 3, 52: 44, 99: 11, 55: 15, 63: 8, 97: 14, 90: 3, 64: 7, 30: 112, 8: 16, 37: 100, 1: 45, 39: 147, 6: 17, 174: 54, 180: 2, 173: 5, 145: 5, 142: 52, 129: 6, 111: 26, 118: 3, 127: 4, 144: 157, 172: 9, 181: 14, 175: 4, 121: 4, 119: 22, 126: 105, 110: 17, 128: 720, 117: 3, 153: 557, 154: 14, 162: 9, 165: 2, 131: 10, 136: 6, 109: 3, 100: 3, 107: 1, 138: 10, 164: 6, 163: 233, 155: 30, 152: 2, 106: 3, 139: 12, 101: 46, 108: 5, 130: 8, 89: 40, 42: 55, 45: 7, 87: 3, 73: 18, 74: 19, 80: 6, 20: 20, 27: 2, 18: 27, 11: 32, 16: 20, 29: 25, 81: 16, 75: 6, 72: 2, 86: 5, 44: 32, 88: 11, 43: 21, 17: 129, 28: 36, 10: 50, 26: 18, 19: 31, 21: 7, 3: 179, 4: 219, 32: 12, 35: 23, 95: 4, 61: 12, 66: 6, 92: 101, 59: 5, 50: 8, 57: 16, 68: 139, 34: 88, 33: 2, 5: 45, 2: 98, 56: 7, 69: 6, 51: 36, 93: 4, 67: 33, 58: 13, 60: 1, 94: 16, 112: 67, 115: 58, 123: 3, 124: 4, 170: 2, 141: 1, 146: 7, 179: 28, 125: 25, 122: 6, 114: 3, 113: 1, 147: 30, 140: 86, 176: 8, 171: 3}
 
         # print('Task 10')
         # forbiddenUsers = list(trackpointsCollection.aggregate([
