@@ -173,53 +173,65 @@ def main():
         # Acitivities: 16048
         # Trackpoints: 9681756
 
-
         # print('Task 2')
         # print('Average number of activities pr user:', activityCount/userCount)
-        # # Average number of activities pr user: 92.76300578034682
-
+        # Average number of activities pr user: 92.76300578034682
 
         # print('Task 3')
-        # print([*activityCollection.aggregate([
-        #     {"$group" : {'_id': "$user_id", 'count': {'$sum': 1}}},
+        # topUserActivities = [*activityCollection.aggregate([
+        #     {"$group": {'_id': "$user_id", 'count': {'$sum': 1}}},
         #     {"$sort": {"count": -1}},
-        # ])][:20])
-        # # [{'_id': 128, 'count': 2102}, {'_id': 153, 'count': 1793}, {'_id': 25, 'count': 715}, {'_id': 163, 'count': 704}, {'_id': 62, 'count': 691}, {'_id': 144, 'count': 563}, {'_id': 41, 'count': 399}, {'_id': 85, 'count': 364}, {'_id': 4, 'count': 346}, {'_id': 140, 'count': 345}, {'_id': 167, 'count': 320}, {'_id': 68, 'count': 280}, {'_id': 17, 'count': 265}, {'_id': 3, 'count': 261}, {'_id': 14, 'count': 236}, {'_id': 126, 'count': 215}, {'_id': 30, 'count': 210}, {'_id': 112, 'count': 208}, {'_id': 11, 'count': 201}, {'_id': 39, 'count': 198}]
+        # ])][:20]
 
+        # print('Top users:')
+        # for user in topUserActivities:
+        #     print(f'''ID: {user['_id']} Count: {user['count']}''')
 
         # print('Task 4')
-        # print([*activityCollection.aggregate([
+        # userTaxi = [*activityCollection.aggregate([
         #     {'$match': {'transportation_mode': 'taxi'}},
-        #     {"$group" : {'_id': "$user_id"}},
-        # ])])
-        # # [{'_id': 10}, {'_id': 85}, {'_id': 62}, {'_id': 58}, {'_id': 128}, {'_id': 78}, {'_id': 163}, {'_id': 80}, {'_id': 111}, {'_id': 98}]
+        #     {"$group": {'_id': "$user_id"}},
+        # ])]
 
+        # print('Users who have taken a taxi:')
+        # for user in userTaxi:
+        #     print(f'''ID: {user['_id']}''')
 
         # print('Task 5')
-        # print([*activityCollection.aggregate([
+        # transportationModes = [*activityCollection.aggregate([
         #     {'$match': {'transportation_mode': {'$ne': ''}}},
-        #     {"$group" : {'_id': "$transportation_mode", 'count': {'$sum': 1}}},
+        #     {"$group": {'_id': "$transportation_mode", 'count': {'$sum': 1}}},
         #     {"$sort": {"count": -1}}
-        # ])])
-        # # [{'_id': 'walk', 'count': 481}, {'_id': 'car', 'count': 419}, {'_id': 'bike', 'count': 262}, {'_id': 'bus', 'count': 199}, {'_id': 'subway', 'count': 133}, {'_id': 'taxi', 'count': 37}, {'_id': 'airplane', 'count': 3}, {'_id': 'train', 'count': 2}, {'_id': 'run', 'count': 1}, {'_id': 'boat', 'count': 1}]
+        # ])]
 
+        # print('Transportation modes and their occurences:')
+        # for mode in transportationModes:
+        #     print(f'''Mode: {mode['_id']} - Count: {mode['count']}''')
 
         # print('Task 6a')
-        # print([*activityCollection.aggregate([
-        #     {"$group" : {'_id': {'$year': '$start_date_time'}, 'count': {'$sum': 1}}},
-        #     {"$sort": {"count": -1}}
-        # ])])
-        # # [{'_id': 2008, 'count': 5895}, {'_id': 2009, 'count': 5879}, {'_id': 2010, 'count': 1487}, {'_id': 2011, 'count': 1204}, {'_id': 2007, 'count': 994}, {'_id': 2012, 'count': 588}, {'_id': 2000, 'count': 1}]
+        # yearActivities = [*activityCollection.aggregate([
+        #     {"$group": {'_id': {'$year': '$start_date_time'}, 'count': {'$sum': 1}}},
+        #     {"$sort": {"count": -1}},
+        #     {"$limit": 1}
+        # ])]
 
+        # print('Year with the most activities:')
+        # for activity in yearActivities:
+        #     print(f'''Year: {activity['_id']} - Count: {activity['count']}''')
 
         # print('Task 6b')
-        # print([*activityCollection.aggregate([
-        #     {'$addFields': {'hours': {'$dateDiff': {'startDate': '$start_date_time', 'endDate': '$end_date_time', 'unit': 'hour'}}}},
-        #     {"$group" : {'_id': {'$year': '$start_date_time'}, 'hours': {'$sum': '$hours'}}},
-        #     {"$sort": {"hours": -1}}
-        # ])])
-        # # [{'_id': 2009, 'hours': 11636}, {'_id': 2008, 'hours': 9105}, {'_id': 2007, 'hours': 2324}, {'_id': 2010, 'hours': 1432}, {'_id': 2011, 'hours': 1130}, {'_id': 2012, 'hours': 721}, {'_id': 2000, 'hours': 0}
-        
+        # yearRecordedHours = [*activityCollection.aggregate([
+        #     {'$addFields': {'hours': {'$dateDiff': {
+        #         'startDate': '$start_date_time', 'endDate': '$end_date_time', 'unit': 'hour'}}}},
+        #     {"$group": {'_id': {'$year': '$start_date_time'},
+        #                 'hours': {'$sum': '$hours'}}},
+        #     {"$sort": {"hours": -1}},
+        #     {"$limit": 1}
+        # ])]
+
+        # print('Year with the most recorded hours:')
+        # for activity in yearRecordedHours:
+        #     print(f'''Year: {activity['_id']} - Hours: {activity['hours']}''')
 
         # print('Task 7')
         # walkActivityIDs = [activity['_id'] for activity in activityCollection.aggregate([
@@ -237,50 +249,57 @@ def main():
         # totalDist = 0
         # for tp in walkTrackpoints:
         #     if lastTP and tp['activity_id'] == lastTP['activity_id']:
-        #         totalDist += haversine((lastTP['lat'], lastTP['lon']), (tp['lat'], tp['lon']))
+        #         totalDist += haversine((lastTP['lat'],
+        #                                lastTP['lon']), (tp['lat'], tp['lon']))
         #     lastTP = tp
 
         # print('Total distance walked by user 112 in 2008:', totalDist)
         # # Total distance walked by user 112 in 2008: 115.47465961507991
 
-
         # print('Task 8')
         # activitiesToAltitudes = [*trackpointsCollection.aggregate([
         #     {'$match': {'altitude': {'$ne': -777}}},
-        #     {"$group" : {
-        #         '_id': '$activity_id', 
+        #     {"$group": {
+        #         '_id': '$activity_id',
         #         'altitudes': {'$push': '$altitude'},
         #     }},
         #     {'$project': {'altitudes': True}},
         #     {'$lookup': {
         #         'from': 'Activity',
-        #         'localField':'_id',
+        #         'localField': '_id',
         #         'foreignField': '_id',
         #         'as': 'activity'
         #     }},
-        #     {'$project': {'altitudes': True, 'user_id': {'$first': '$activity.user_id'}}} # Dette e ganske sjuk syntax
+        #     # Dette e ganske sjuk syntax
+        #     {'$project': {'altitudes': True, 'user_id': {'$first': '$activity.user_id'}}}
         # ])]
 
         # # print('Activities:', len(activitiesToAltitudes))
         # # # Activities: 16041
         # # # Det finnes 7 activities uten trackpoints tydeligvis...
 
-        # userToAltitudeGained = dict.fromkeys([a['user_id'] for a in activitiesToAltitudes], 0)
+        # userToAltitudeGained = dict.fromkeys(
+        #     [a['user_id'] for a in activitiesToAltitudes], 0)
         # for activityToAltitudes in activitiesToAltitudes:
         #     lastAltitude = None
         #     for altitude in activityToAltitudes['altitudes']:
         #         if lastAltitude != None and altitude > lastAltitude:
-        #             userToAltitudeGained[activityToAltitudes['user_id']] += (altitude - lastAltitude)
+        #             userToAltitudeGained[activityToAltitudes['user_id']
+        #                                  ] += (altitude - lastAltitude)
         #         lastAltitude = altitude
-        # userToAltitudeGained = dict(sorted(userToAltitudeGained.items(), key=lambda kv: kv[1], reverse=True))
-        # userToAltitudeGained = {k: userToAltitudeGained[k] for k in list(userToAltitudeGained)[:20]}
-        # print(userToAltitudeGained)
-        # # {128: 2135669.282417741, 153: 1820736.9522737002,x 4: 1089358.0, 41: 789924.1000003539, 3: 766613.0, 85: 714053.1000000071, 163: 673472.3440420027, 62: 596106.5999999233, 144: 588718.9123359431, 30: 576377.0, 39: 481311.0, 84: 430319.0, 0: 398638.0, 2: 377503.0, 167: 370650.1136482952, 25: 358131.7999999046, 37: 325572.79999995086, 140: 311175.52283458825, 126: 272394.47427820024, 17: 205319.39999998698}
+        # userToAltitudeGained = dict(
+        #     sorted(userToAltitudeGained.items(), key=lambda kv: kv[1], reverse=True))
+        # userToAltitudeGained = {
+        #     k: userToAltitudeGained[k] for k in list(userToAltitudeGained)[:20]}
+
+        # for user in userToAltitudeGained:
+        #     print(
+        #         f'''ID: {user} - Altitude: {userToAltitudeGained.get(user)}''')
 
         # print('Task 9')
         # activityToTimestamps = [*trackpointsCollection.aggregate([
         #     {"$group" : {
-        #         '_id': '$activity_id', 
+        #         '_id': '$activity_id',
         #         'date_times': {'$push': '$date_time'},
         #     }},
         #     {'$lookup': {
@@ -329,7 +348,6 @@ def main():
         # ]))
         # print([u['_id'] for u in forbiddenUsers])
         # # [4, 131, 18]
-        
 
         # print('Task 11')
         # usersTransportation = list(activityCollection.aggregate([
